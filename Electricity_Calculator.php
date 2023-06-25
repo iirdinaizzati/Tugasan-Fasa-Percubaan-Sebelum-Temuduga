@@ -23,25 +23,41 @@
       <button type="submit" class="btn btn-primary">Calculate</button>
     </form>
     <hr>
+
     <?php
+    function calculateElectricityRates($voltage, $current, $rate) {
+      // Calculate power in watts
+      $power = $voltage * $current;
+
+      // Calculate energy in kilowatt-hours per hour
+      $energyPerHour = $power * 1 / 1000;
+
+      // Calculate energy in kilowatt-hours per day (24 hours)
+      $energyPerDay = $energyPerHour * 24;
+
+      // Calculate total charge per day
+      $totalChargePerDay = $energyPerDay * ($rate / 100);
+
+      return array(
+        'power' => $power,
+        'energyPerHour' => $energyPerHour,
+        'energyPerDay' => $energyPerDay,
+        'totalChargePerDay' => $totalChargePerDay
+      );
+    }
+
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $voltage = $_POST["voltage"];
       $current = $_POST["current"];
       $rate = $_POST["rate"];
 
-      // Calculate power in watts
-      $power = $voltage * $current;
-
-      // Calculate energy in kilowatt-hours
-      $energy = $power * 1 * 1000;
-
-      // Calculate total charge
-      $totalCharge = $energy * ($rate / 100);
+      $results = calculateElectricityRates($voltage, $current, $rate);
 
       echo "<h3>Results:</h3>";
-      echo "Power: $power Watts<br>";
-      echo "Energy: $energy kWh<br>";
-      echo "Total Charge (RM): $totalCharge<br>";
+      echo "Power: " . $results['power'] . " Watts<br>";
+      echo "Energy per Hour: " . $results['energyPerHour'] . " kWh<br>";
+      echo "Energy per Day: " . $results['energyPerDay'] . " kWh<br>";
+      echo "Total Charge per Day (RM): " . $results['totalChargePerDay'] . "<br>";
     }
     ?>
   </div>
