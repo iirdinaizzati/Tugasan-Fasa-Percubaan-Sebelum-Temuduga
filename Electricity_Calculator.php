@@ -25,41 +25,52 @@
     <hr>
 
     <?php
-    function calculateElectricityRates($voltage, $current, $rate) {
+    function calculateElectricityRates($voltage, $current, $rate, $hour) {
       // Calculate power in watts
       $power = $voltage * $current;
 
-      // Calculate energy in kilowatt-hours per hour
-      $energyPerHour = $power * 1 / 1000;
+      // Calculate energy per hour in kilowatt-hours
+      $energyPerHour = $power * $hour / 1000;
 
-      // Calculate energy in kilowatt-hours per day (24 hours)
-      $energyPerDay = $energyPerHour * 24;
-
-      // Calculate total charge per day
-      $totalChargePerDay = $energyPerDay * ($rate / 100);
+      // Calculate total charge per hour
+      $totalChargePerHour = $energyPerHour * ($rate / 100);
 
       return array(
         'power' => $power,
         'energyPerHour' => $energyPerHour,
-        'energyPerDay' => $energyPerDay,
-        'totalChargePerDay' => $totalChargePerDay
+        'totalChargePerHour' => $totalChargePerHour
       );
     }
+
+
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $voltage = $_POST["voltage"];
       $current = $_POST["current"];
       $rate = $_POST["rate"];
-
-      $results = calculateElectricityRates($voltage, $current, $rate);
-
-      echo "<h3>Results:</h3>";
-      echo "Power: " . $results['power'] . " Watts<br>";
-      echo "Energy per Hour: " . $results['energyPerHour'] . " kWh<br>";
-      echo "Energy per Day: " . $results['energyPerDay'] . " kWh<br>";
-      echo "Total Charge per Day (RM): " . $results['totalChargePerDay'] . "<br>";
     }
+
+
+    echo "<h3>Results:</h3>";
+    echo "Power: " . ($voltage * $current) . " Watts (" . ($voltage * $current) / 1000 . " kW)<br>";
+    echo "Rate: " . ($rate / 100) . " RM<br>";
+
+    echo "<br>";
+
+    echo "<h3>Hourly Calculation:</h3>";
+    echo "<table class='table'>";
+    echo "<thead><tr><th>Hour</th><th>Energy per Hour (kWh)</th><th>Total Charge per Hour (RM)</th></tr></thead>";
+    echo "<tbody>";
+    for ($hour = 1; $hour <= 24; $hour++) {
+      $results = calculateElectricityRates($voltage, $current, $rate, $hour);
+      $energyPerHour = $results['energyPerHour'];
+      $totalChargePerHour = $results['totalChargePerHour'];
+      echo "<tr><td>$hour</td><td>$energyPerHour</td><td>$totalChargePerHour</td></tr>";
+    }
+    echo "</tbody>";
+    echo "</table>";
     ?>
+
   </div>
 </body>
 </html>
